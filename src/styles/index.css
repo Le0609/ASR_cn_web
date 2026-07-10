@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-white font-sans text-body antialiased;
+    /* 温暖渐变背景（Apple Music 风格） */
+    background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 50%, #F5F5F7 100%);
+    background-attachment: fixed;
+  }
+
+  /* 统一 selection 高亮为深灰（去蓝化） */
+  ::selection {
+    background: rgba(29, 29, 31, 0.12);
+  }
+}
+
+@layer components {
+  /* 主按钮：深灰黑，圆角，柔和阴影 */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-button bg-brand px-6 py-3
+      font-semibold text-white shadow-btn transition-all duration-200
+      hover:bg-brand-hover hover:shadow-card active:scale-[0.98]
+      disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  /* 次级按钮：浅灰底 */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-button bg-canvas px-6 py-3
+      font-medium text-ink transition-all duration-200 shadow-btn
+      hover:bg-divider active:scale-[0.98]
+      disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  /* 文字按钮 */
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium
+      text-ink transition-all duration-200 hover:bg-ink/5 active:bg-ink/10;
+  }
+
+  /* 卡片容器：毛玻璃 + 柔和阴影（Arc + Apple Music 融合） */
+  .card {
+    @apply rounded-card bg-white/80 backdrop-blur-xl p-6 shadow-card sm:p-8
+      border border-black/[0.04];
+  }
+}
+
+/* 自定义细滚动条（编辑区、历史列表） */
+.scroll-slim::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-slim::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+.scroll-slim::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* ===== 波形背景样式画廊：CSS 动画（轻量、GPU 加速） ===== */
+
+/* 竖条律动：柱条上下伸缩 */
+@keyframes barPulse {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+
+/* 流动横移：整条波形缓慢平移，形成流动感 */
+@keyframes waveDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* 涟漪扩散：同心圆放大淡出 */
+@keyframes rippleOut {
+  0% { transform: scale(0.2); opacity: 0.7; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* 极光漂浮：柔和光斑缓慢位移缩放 */
+@keyframes auroraFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(6%, -4%) scale(1.15); }
+  66% { transform: translate(-5%, 5%) scale(0.9); }
+}
+
+/* 点阵呼吸 */
+@keyframes dotBreathe {
+  0%, 100% { transform: scale(0.5); opacity: 0.35; }
+  50% { transform: scale(1); opacity: 1; }
+}
+
+/* 尊重用户的减少动效偏好 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
