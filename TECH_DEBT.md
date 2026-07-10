@@ -4,6 +4,29 @@
 
 ---
 
+## 📝 v0.0.2 修复记录（2026-07-10）
+
+**问题**：前端调用 ASR 服务报错，功能完全不可用。
+
+**根因**：Modal 上的 Gradio 服务用的是三段式协议（上传 → 提交任务 → SSE 监听结果），
+之前 `realASR.ts` 实现的是假设的单次 `/api/predict` 调用，从未针对真实后端验证过，导致 404。
+
+**修复**：
+- 按 `FRONTEND_INTEGRATION_FIXED.md` 重写 `src/api/realASR.ts`，改为三段式调用：
+  1. `POST /gradio_api/upload` 上传音频
+  2. `POST /gradio_api/call/transcribe` 提交任务
+  3. `GET /gradio_api/call/transcribe/{event_id}`（SSE）监听结果
+- 已用 curl 完整验证三段式协议（含正常识别、错误 event_id 两种场景），非纸面验证
+- 修复过程中发现并修正一个回归 bug：重写时遗漏了 `AbortError` 判断，会导致用户取消转写后仍触发 3 次重试
+
+**遗留的文档债务**（未在本次修复范围内处理）：
+- `FEATURES.md:175`、`TEST_CHECKLIST.md:12` 仍引用旧版 `localhost:8000` 本地部署场景，描述的是历史上的本地测试流程，不影响当前生产功能，留待下次文档清理时统一处理
+
+**待验证**（受限于无 GUI 环境，本次未做浏览器手动点击验证）：
+- 建议部署后实际在浏览器里走一遍完整上传 → 转写 → 导出流程，尤其关注 SSE 连接在真实浏览器 `EventSource` 实现下的行为（curl 只验证了 HTTP 层协议，未验证浏览器 `EventSource` 对象的事件分发）
+
+---
+
 ## 🔴 高优先级（影响用户信任和体验）
 
 ### 1. 置信度指标显示虚假数据

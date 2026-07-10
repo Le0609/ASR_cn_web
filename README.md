@@ -2,7 +2,7 @@
 
 一个 Apple 风格的语音转文字 Web 应用。上传音频，几秒内转成可编辑的文字稿，在线校对后一键导出 TXT。所有转写数据仅存储在浏览器本地。
 
-> ✅ 已对接 **真实 ASR 服务**（本地运行于 http://localhost:8000），基于 FunASR 预训练模型。支持快速模式（Conformer）与精准模式（FunASR）双引擎识别。
+> ✅ 已对接 **真实 ASR 服务**（部署于 Modal 云平台，Gradio 应用），基于 FunASR 预训练模型。支持快速模式（Conformer）与精准模式（FunASR）双引擎识别。
 
 ## ✨ 功能
 
@@ -93,23 +93,23 @@ netlify deploy --prod
 
 ## 🔌 ASR 后端服务
 
-前端已对接真实 ASR 服务，后端项目位于 `/Users/le/Downloads/code/202606/ASR`。
+前端对接部署在 Modal 云平台的 Gradio ASR 服务，服务地址：`https://le0609--chinese-asr-serve.modal.run`
 
-### 启动后端服务
+后端训练代码位于 `/Users/le/Downloads/code/202606/ASR`（本地训练/调试用，生产环境不需要启动）。
 
-```bash
-cd /Users/le/Downloads/code/202606/ASR
-# 根据后端项目的具体启动方式运行（Python/FastAPI 等）
-# 默认监听 http://localhost:8000
-```
+### 接口说明（Gradio 三段式协议）
 
-### 接口说明
+Gradio 应用不提供传统 REST 接口，识别过程分三步：
 
-- **健康检查**：`GET /health` - 返回服务状态与可用模式
-- **快速转写**：`POST /api/transcribe/fast` - Conformer 引擎，速度快
-- **精准转写**：`POST /api/transcribe/accurate` - FunASR 引擎，准确率高
+1. **上传音频**：`POST /gradio_api/upload`（`multipart/form-data`，字段名 `files`）→ 返回临时文件路径
+2. **提交任务**：`POST /gradio_api/call/transcribe`（JSON，携带文件路径与模式）→ 返回 `event_id`
+3. **监听结果**：`GET /gradio_api/call/transcribe/{event_id}`（Server-Sent Events）→ 收到 `complete` 事件后解析识别文本
 
-前端会根据用户选择的模式自动调用对应接口。接口层封装在 [`src/api/realASR.ts`](src/api/realASR.ts)。
+模式参数为字符串 `"快速模式 (Conformer)"` 或 `"高精度模式 (FunASR)"`。
+
+前端会根据用户选择的模式自动调用对应流程，接口层封装在 [`src/api/realASR.ts`](src/api/realASR.ts)。
+
+**注意**：Modal 服务 5 分钟无请求会自动休眠，首次请求（尤其精准模式）冷启动可能耗时 10-30 秒，前端已加入等待提示。
 
 ## 📁 目录结构
 

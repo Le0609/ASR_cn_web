@@ -28,7 +28,7 @@ export interface TranscribeOptions {
   signal?: AbortSignal;
   /**
    * 转写模式：'fast'（Conformer，实时）或 'accurate'（FunASR，高精度）。
-   * 对应后端两个独立接口 /api/transcribe/fast 与 /api/transcribe/accurate。
+   * 映射为 Gradio 后端的模式参数（"快速模式 (Conformer)" / "高精度模式 (FunASR)"）。
    */
   mode?: TranscribeMode;
 }

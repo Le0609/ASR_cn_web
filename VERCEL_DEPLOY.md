@@ -104,10 +104,12 @@ https://echo-asr-你的用户名.vercel.app
 **原因**: 后端服务不可达或 CORS 问题
 
 **解决**:
-1. 在浏览器控制台（F12 → Network）查看 API 请求
-2. 确认请求的 URL 是 `https://le0609--chinese-asr-serve.modal.run/api/predict`
-3. 检查是否有 CORS 错误（跨域问题）
-4. 访问后端地址 https://le0609--chinese-asr-serve.modal.run 确认服务在线
+1. 在浏览器控制台（F12 → Network）查看 API 请求，应依次看到三个请求：
+   - `POST /gradio_api/upload` → 200，返回文件路径
+   - `POST /gradio_api/call/transcribe` → 200，返回 `event_id`
+   - `GET /gradio_api/call/transcribe/{event_id}` → SSE 连接，等待 `complete` 事件
+2. 检查是否有 CORS 错误（跨域问题）
+3. 访问后端地址 https://le0609--chinese-asr-serve.modal.run 确认服务在线
 
 ### 问题 4: "首次加载很慢"
 
